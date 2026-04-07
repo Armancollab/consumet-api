@@ -1,0 +1,18 @@
+FROM node:20
+
+WORKDIR /app
+
+# Install deps
+COPY package*.json ./
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Set env
+ENV PORT=3000
+
+EXPOSE 3000
+
+# Run with ts-node (matches your project)
+CMD ["npm", "start"]
