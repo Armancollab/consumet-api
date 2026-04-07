@@ -4,7 +4,7 @@ LABEL version="1.0.0"
 LABEL description="Consumet API (fastify) Docker Image"
 
 # update packages, to reduce risk of vulnerabilities
-RUN apk update && apk upgrade
+RUN apk update && apk upgrade && apk add --no-cache git
 # RUN apk cache clean
 
 # set a non privileged user to use when running this image
@@ -24,8 +24,6 @@ ENV NPM_CONFIG_LOGLEVEL=warn
 
 # copy project definition/dependencies files, for better reuse of layers
 COPY --chown=nodejs:nodejs package*.json ./
-
-RUN apk add --no-cache git
 
 # install dependencies here, for better reuse of layers
 RUN npm install && npm update && npm cache clean --force
