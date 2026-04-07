@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import fastify from 'fastify';
+import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import FastifyCors from '@fastify/cors';
 
 import anime from './routes/anime';
@@ -9,7 +9,7 @@ import meta from './routes/meta';
 const start = async () => {
   const PORT = Number(process.env.PORT) || 3000;
   
-  const app = fastify({
+  const app = Fastify({
     logger: true,
   });
 
@@ -22,14 +22,14 @@ const start = async () => {
     await app.register(anime, { prefix: '/anime' });
     await app.register(meta, { prefix: '/meta' });
 
-    app.get('/', async (request, reply) => {
+    app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
       return reply.status(200).send({
         message: 'Welcome to consumet api!',
         routes: ['/anime', '/meta'],
       });
     });
 
-    app.get('*', async (request, reply) => {
+    app.get('*', async (request: FastifyRequest, reply: FastifyReply) => {
       return reply.status(404).send({
         error: 'page not found',
         message: '',
