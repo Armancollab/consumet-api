@@ -14,13 +14,13 @@ const start = async () => {
   });
 
   try {
-    await app.register(FastifyCors, {
+    app.register(FastifyCors, {
       origin: '*',
       methods: 'GET',
     });
 
-    await app.register(anime, { prefix: '/anime' });
-    await app.register(meta, { prefix: '/meta' });
+    app.register(anime, { prefix: '/anime' });
+    app.register(meta, { prefix: '/meta' });
 
     app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
       return reply.status(200).send({
