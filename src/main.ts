@@ -1,50 +1,43 @@
 require('dotenv').config();
 
-import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
+import Fastify from 'fastify';
 import FastifyCors from '@fastify/cors';
 
 import anime from './routes/anime';
 import meta from './routes/meta';
 
-const start = async () => {
+(async () => {
   const PORT = Number(process.env.PORT) || 3000;
-  
-  const app = Fastify({
+  const fastify = Fastify({
     logger: true,
   });
+  
+  await fastify.register(FastifyCors, {
+    origin: '*',
+    methods: 'GET',
+  });
+  
+  await fastify.register(anime, { prefix: '/anime' });
+  await fastify.register(meta, { prefix: '/meta' });
 
   try {
-    app.register(FastifyCors, {
-      origin: '*',
-      methods: 'GET',
+    fastify.get('/', (_, rp) => {
+      rp.status(200).send('Welcome to consumet api! 🎉');
     });
-
-    app.register(anime, { prefix: '/anime' });
-    app.register(meta, { prefix: '/meta' });
-
-    app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-      return reply.status(200).send({
-        message: 'Welcome to consumet api!',
-        routes: ['/anime', '/meta'],
-      });
-    });
-
-    app.get('*', async (request: FastifyRequest, reply: FastifyReply) => {
-      return reply.status(404).send({
-        error: 'page not found',
+    
+    fastify.get('*', (request, reply) => {
+      reply.status(404).send({
         message: '',
+        error: 'page not found',
       });
     });
 
-    await app.listen({ port: PORT, host: '0.0.0.0' });
-    console.log(`Server listening on port ${PORT}`);
-  } catch (err) {
-    app.log.error(err);
+    fastify.listen({ port: PORT, host: '0.0.0.0' }, (e, address) => {
+      if (e) throw e;
+      console.log(`server listening on ${address}`);
+    });
+  } catch (err: any) {
+    fastify.log.error(err);
     process.exit(1);
   }
-};
-
-start().catch((err) => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
-});
+})();
